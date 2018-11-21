@@ -1,8 +1,10 @@
 # Maintainer : bartus <arch-user-repoᘓbartus.33mail.com>
 
+#to enforce cuda verison uncomment this line and update value of sm_xx model accordingly
+_cuda_capability="sm_50"
 
 pkgname=blender-2.8-git
-pkgver=2.8_r78999.c86b5fa820d
+pkgver=2.8_r82468.ed1ee89288e
 pkgrel=1
 pkgdesc="Development version of Blender 2.8 branch"
 arch=('i686' 'x86_64')
@@ -11,7 +13,8 @@ depends=('alembic' 'libgl' 'python' 'python-numpy' 'openjpeg' 'desktop-file-util
          'ffmpeg' 'fftw' 'openal' 'freetype2' 'libxi' 'openimageio' 'opencolorio'
          'openvdb' 'opencollada' 'opensubdiv' 'openshadinglanguage' 'libtiff' 'libpng')
 optdepends=('cuda: CUDA support in Cycles')
-makedepends=('git' 'cmake' 'boost' 'mesa' 'llvm')
+makedepends=('pacman-contrib' 'git' 'cmake' 'cuda' 'boost' 'mesa' 'llvm')
+options=(!strip)
 provides=('blender-2.8')
 conflicts=('blender-2.8')
 license=('GPL')
@@ -22,12 +25,11 @@ install=blender.install
 # More info:
 #   http://wiki.blender.org/index.php/Dev:Doc/Tools/Git
 source=('git://git.blender.org/blender.git#branch=blender2.8' \
-        'blender-addons.git::git://git.blender.org/blender-addons.git' \
-        'blender-addons-contrib.git::git://git.blender.org/blender-addons-contrib.git' \
+        'blender-addons.git::git://git.blender.org/blender-addons.git#branch=blender2.8' \
+        'blender-addons-contrib.git::git://git.blender.org/blender-addons-contrib.git#branch=blender2.8' \
         'blender-translations.git::git://git.blender.org/blender-translations.git' \
         'blender-dev-tools.git::git://git.blender.org/blender-dev-tools.git' \
         blender-2.8.desktop \
-        SelectCudaComputeArch.patch \
         ffmpeg.patch \
         )
 md5sums=('SKIP'
@@ -36,15 +38,7 @@ md5sums=('SKIP'
          'SKIP'
          'SKIP'
          'cd108dca1c77607c6a7cc45aa284ea97'
-         '9454ff7e994f72ead5027356e227cbd2'
          '9d4bfb5b3dd33e95b13cc6c7d9d2d2e1')
-
-# determine whether we can precompile CUDA kernels
-_CUDA_PKG=`pacman -Qq cuda 2>/dev/null` || true
-if [ "$_CUDA_PKG" != "" ]; then
-    _EXTRAOPTS="-DWITH_CYCLES_CUDA_BINARIES=ON \
-                -DCUDA_TOOLKIT_ROOT_DIR=/opt/cuda"
-fi
 
 pkgver() {
   cd "$srcdir/blender"
@@ -54,19 +48,29 @@ pkgver() {
 prepare() {
   cd "$srcdir/blender"
   # update the submodules
-  git submodule update --init --recursive
-  git submodule foreach git checkout master
-  git submodule foreach git pull --rebase origin master
-  git apply ${srcdir}/SelectCudaComputeArch.patch
+  git submodule update --init --recursive --remote
+#  git submodule foreach git checkout master
+#  git submodule foreach git pull --rebase origin master
   git apply ${srcdir}/ffmpeg.patch
 }
 
 build() {
+
   mkdir -p "$srcdir/blender-build"
   cd "$srcdir/blender-build"
   
   _pyver=$(python -c "from sys import version_info; print(\"%d.%d\" % (version_info[0],version_info[1]))")
   msg "python version detected: ${_pyver}"
+
+  # determine whether we can precompile CUDA kernels
+  _CUDA_PKG=`pacman -Qq cuda 2>/dev/null` || true
+  if [ "$_CUDA_PKG" != "" ]; then
+      _EXTRAOPTS=(-DWITH_CYCLES_CUDA_BINARIES=ON \
+                  -DCUDA_TOOLKIT_ROOT_DIR=/opt/cuda)
+      if [ "$_cuda_capability" != "" ]; then
+        _EXTRAOPTS+=(-DCYCLES_CUDA_BINARIES_ARCH:STRING="${_cuda_capability}")
+      fi
+  fi
 
   export CFLAGS="${CFLAGS} -DOPENVDB_3_ABI_COMPATIBLE"
   export CXXFLAGS="${CXXFLAGS} -DOPENVDB_3_ABI_COMPATIBLE"
@@ -91,7 +95,7 @@ build() {
         -DWITH_OPENVDB=ON \
         -DWITH_OPENVDB_BLOSC=ON \
         -DWITH_OPENCOLLADA=ON \
-        $_EXTRAOPTS
+        ${_EXTRAOPTS[@]}
   make
 }
 
@@ -121,9 +125,10 @@ package() {
     mv $icon ${icon%.*}-2.8.${icon##/*.}
   done
 
-  if [ -e "$pkgdir"/usr/share/blender/*/scripts/addons/cycles/lib/ ] ; then
-    # make sure the cuda kernels are not stripped
-    chmod 444 "$pkgdir"/usr/share/blender/*/scripts/addons/cycles/lib/*
-  fi
+  ## not needed when using options=(!strip)?
+  #if [ -e "$pkgdir"/usr/share/blender/*/scripts/addons/cycles/lib/ ] ; then
+  #  # make sure the cuda kernels are not stripped
+  #  chmod 444 "$pkgdir"/usr/share/blender/*/scripts/addons/cycles/lib/*
+  #fi
 }
 # vim:set sw=2 ts=2 et:
