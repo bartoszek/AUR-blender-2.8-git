@@ -1,0 +1,23 @@
+sudo: required
+
+branches:
+  only:
+#   - master
+#   - stable
+    - devel
+
+services:
+- docker
+
+arch:
+# repos:
+# - papyros=http://dash.papyros.io/repos/$repo/$arch
+  packages:
+  # arch/aur packages
+# - python
+# - perl
+  script:
+  - "makepkg -s --noconfirm"
+
+script:
+- "curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash"
