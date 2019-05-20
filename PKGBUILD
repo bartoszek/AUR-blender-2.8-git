@@ -24,7 +24,7 @@ install=blender.install
 # the path in .gitmodules.
 # More info:
 #   http://wiki.blender.org/index.php/Dev:Doc/Tools/Git
-source=('git://git.blender.org/blender.git#branch=blender2.8' \
+source=('git://git.blender.org/blender.git#branch=master' \
         'blender-addons.git::git://git.blender.org/blender-addons.git#branch=blender2.8' \
         'blender-addons-contrib.git::git://git.blender.org/blender-addons-contrib.git#branch=blender2.8' \
         'blender-translations.git::git://git.blender.org/blender-translations.git' \
