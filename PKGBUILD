@@ -4,11 +4,12 @@
 _cuda_capability="sm_50"
 
 pkgname=blender-2.8-git
+_fragment="#branch=master"
 pkgver=2.8_r82468.ed1ee89288e
 pkgrel=1
 pkgdesc="Development version of Blender 2.8 branch"
 arch=('i686' 'x86_64')
-url="http://blender.org/"
+url="https://blender.org/"
 depends=('alembic' 'libgl' 'python' 'python-numpy' 'openjpeg' 'desktop-file-utils' 'hicolor-icon-theme'
          'ffmpeg' 'fftw' 'openal' 'freetype2' 'libxi' 'openimageio' 'opencolorio'
          'openvdb' 'opencollada' 'opensubdiv' 'openshadinglanguage' 'libtiff' 'libpng')
@@ -24,13 +25,13 @@ install=blender.install
 # the path in .gitmodules.
 # More info:
 #   http://wiki.blender.org/index.php/Dev:Doc/Tools/Git
-source=('git://git.blender.org/blender.git#branch=master' \
-        'blender-addons.git::git://git.blender.org/blender-addons.git#branch=blender2.8' \
-        'blender-addons-contrib.git::git://git.blender.org/blender-addons-contrib.git#branch=blender2.8' \
+source=("git://git.blender.org/blender.git${_fragment}" \
+        'blender-addons.git::git://git.blender.org/blender-addons.git' \
+        'blender-addons-contrib.git::git://git.blender.org/blender-addons-contrib.git' \
         'blender-translations.git::git://git.blender.org/blender-translations.git' \
         'blender-dev-tools.git::git://git.blender.org/blender-dev-tools.git' \
         blender-2.8.desktop \
-        ffmpeg.patch \
+        SelectCudaComputeArch.patch \
         )
 md5sums=('SKIP'
          'SKIP'
@@ -38,7 +39,7 @@ md5sums=('SKIP'
          'SKIP'
          'SKIP'
          'cd108dca1c77607c6a7cc45aa284ea97'
-         '9d4bfb5b3dd33e95b13cc6c7d9d2d2e1')
+         '2f1b08655352e70c7c74d4957d481dc8')
 
 pkgver() {
   cd "$srcdir/blender"
@@ -49,9 +50,6 @@ prepare() {
   cd "$srcdir/blender"
   # update the submodules
   git submodule update --init --recursive --remote
-#  git submodule foreach git checkout master
-#  git submodule foreach git pull --rebase origin master
-  git apply ${srcdir}/ffmpeg.patch
 }
 
 build() {
@@ -74,7 +72,6 @@ build() {
 
   export CFLAGS="${CFLAGS} -DOPENVDB_3_ABI_COMPATIBLE"
   export CXXFLAGS="${CXXFLAGS} -DOPENVDB_3_ABI_COMPATIBLE"
-
   cmake "$srcdir/blender" \
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DWITH_INSTALL_PORTABLE=OFF \
