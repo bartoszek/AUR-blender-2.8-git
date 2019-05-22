@@ -14,7 +14,8 @@ depends=('alembic' 'libgl' 'python' 'python-numpy' 'openjpeg' 'desktop-file-util
          'ffmpeg' 'fftw' 'openal' 'freetype2' 'libxi' 'openimageio' 'opencolorio'
          'openvdb' 'opencollada' 'opensubdiv' 'openshadinglanguage' 'libtiff' 'libpng')
 optdepends=('cuda: CUDA support in Cycles')
-makedepends=('pacman-contrib' 'git' 'cmake' 'cuda' 'boost' 'mesa' 'llvm')
+makedepends=('pacman-contrib' 'git' 'cmake' 'boost' 'mesa' 'llvm')
+#makedepends+=('cuda') # disable to prevent build process from exiting Travis 50m build time limit
 options=(!strip)
 provides=('blender-2.8')
 conflicts=('blender-2.8')
