@@ -3,8 +3,17 @@ sudo: required
 branches:
   only:
 #   - master
-#   - stable
-    - devel
+#   - devel
+    - travis
+
+cache:
+  directories:
+  - src
+  - blender-addons-contrib.git
+  - blender-addons.git
+  - blender-dev-tools.git
+  - blender-translations.git
+  - blender
 
 services:
 - docker
@@ -21,3 +30,8 @@ arch:
 
 script:
 - "curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash"
+- "ls"
+
+deploy:
+# file location $(cwd)/blender-2.8-git-2.8*.pkg.tar.xz
+#- deploy.sh
