@@ -2,13 +2,12 @@ sudo: required
 
 branches:
   only:
-#   - master
-#   - devel
-    - travis
+  - travis
 
 cache:
   directories:
-  - src
+  - .ccache
+  - AUR-repo
   - blender-addons-contrib.git
   - blender-addons.git
   - blender-dev-tools.git
@@ -19,19 +18,23 @@ services:
 - docker
 
 arch:
-# repos:
-# - papyros=http://dash.papyros.io/repos/$repo/$arch
+  repos:
+  - bartus=https://github.com/bartoszek/AUR-repo/raw/master
   packages:
-  # arch/aur packages
-# - python
-# - perl
+  - ccache
   script:
+  - "echo 'options+=(ccache)' >> PKGBUILD"
+  - "export CCACHE_DIR='/build/.ccache'"
   - "makepkg -s --noconfirm"
+  - "ccache -s"
 
 script:
 - "curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash"
-- "ls"
+- "CCACHE_DIR=\"$(pwd)/.ccache\" ccache -s"
 
 deploy:
-# file location $(cwd)/blender-2.8-git-2.8*.pkg.tar.xz
-#- deploy.sh
+  on:
+    branch: travis
+  skip_cleanup: true
+  provider: script
+  script: bash .travis_deploy.sh
