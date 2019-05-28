@@ -1,11 +1,12 @@
 # Maintainer : bartus <arch-user-repoᘓbartus.33mail.com>
 
 #to enforce cuda verison uncomment this line and update value of sm_xx model accordingly
-_cuda_capability="sm_50"
+#_cuda_capability+=(sm_30 sm_35 sm_37) # suppress to prevent Travis build exceed time limit.
+_cuda_capability+=(sm_50 sm_52 sm_60 sm_61 sm_70 sm_75)
 
 pkgname=blender-2.8-git
 _fragment="#branch=master"
-pkgver=2.8_r82468.ed1ee89288e
+pkgver=2.8.r88142.8949dfb7a6e
 pkgrel=1
 pkgdesc="Development version of Blender 2.8 branch"
 arch=('i686' 'x86_64')
@@ -14,7 +15,7 @@ depends=('alembic' 'libgl' 'python' 'python-numpy' 'openjpeg' 'desktop-file-util
          'ffmpeg' 'fftw' 'openal' 'freetype2' 'libxi' 'openimageio' 'opencolorio'
          'openvdb' 'opencollada' 'opensubdiv' 'openshadinglanguage' 'libtiff' 'libpng')
 optdepends=('cuda: CUDA support in Cycles')
-makedepends=('pacman-contrib' 'git' 'cmake' 'boost' 'mesa' 'llvm')
+makedepends=('git' 'cmake' 'boost' 'mesa' 'llvm')
 #makedepends+=('cuda') # disable to prevent build process from exiting Travis 50m build time limit
 options=(!strip)
 provides=('blender-2.8')
@@ -44,13 +45,16 @@ md5sums=('SKIP'
 
 pkgver() {
   cd "$srcdir/blender"
-  printf "2.8_r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+  printf "2.8.r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
 prepare() {
   cd "$srcdir/blender"
   # update the submodules
   git submodule update --init --recursive --remote
+  if [ -z "$_cuda_capability" ] && grep -q nvidia <(lsmod); then 
+    git apply -v ${srcdir}/SelectCudaComputeArch.patch
+  fi
 }
 
 build() {
@@ -67,7 +71,7 @@ build() {
       _EXTRAOPTS=(-DWITH_CYCLES_CUDA_BINARIES=ON \
                   -DCUDA_TOOLKIT_ROOT_DIR=/opt/cuda)
       if [ "$_cuda_capability" != "" ]; then
-        _EXTRAOPTS+=(-DCYCLES_CUDA_BINARIES_ARCH:STRING="${_cuda_capability}")
+        _EXTRAOPTS+=(-DCYCLES_CUDA_BINARIES_ARCH=$(IFS=';'; echo "${_cuda_capability[*]}";))
       fi
   fi
 

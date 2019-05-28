@@ -22,6 +22,7 @@ arch:
   - bartus=https://github.com/bartoszek/AUR-repo/raw/master
   packages:
   - ccache
+  - cuda
   script:
   - "echo 'options+=(ccache)' >> PKGBUILD"
   - "export CCACHE_DIR='/build/.ccache'"
