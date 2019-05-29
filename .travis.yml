@@ -23,10 +23,11 @@ arch:
   packages:
   - ccache
   - cuda
+  - moreutils
   script:
   - "echo 'options+=(ccache)' >> PKGBUILD"
   - "export CCACHE_DIR='/build/.ccache'"
-  - "makepkg -s --noconfirm"
+  - "makepkg -s --noconfirm|ts -s '[%.T]'"
   - "ccache -s"
 
 script:
