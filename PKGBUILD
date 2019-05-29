@@ -14,9 +14,9 @@ url="https://blender.org/"
 depends=('alembic' 'libgl' 'python' 'python-numpy' 'openjpeg' 'desktop-file-utils' 'hicolor-icon-theme'
          'ffmpeg' 'fftw' 'openal' 'freetype2' 'libxi' 'openimageio' 'opencolorio'
          'openvdb' 'opencollada' 'opensubdiv' 'openshadinglanguage' 'libtiff' 'libpng')
-optdepends=('cuda: CUDA support in Cycles')
+#optdepends=('cuda: CUDA support in Cycles')
 makedepends=('git' 'cmake' 'boost' 'mesa' 'llvm')
-#makedepends+=('cuda') # disable to prevent build process from exiting Travis 50m build time limit
+makedepends+=('cuda') # disable to prevent build process from exiting Travis 50m build time limit
 options=(!strip)
 provides=('blender-2.8')
 conflicts=('blender-2.8')

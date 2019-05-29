@@ -22,7 +22,6 @@ arch:
   - bartus=https://github.com/bartoszek/AUR-repo/raw/master
   packages:
   - ccache
-  - cuda
   - moreutils
   script:
   - "echo 'options+=(ccache)' >> PKGBUILD"
