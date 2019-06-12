@@ -28,7 +28,7 @@ arch:
   - "export CCACHE_DIR='/build/.ccache'"
 #    COMPRESSXZ=(), can't be passed to makepkg as bash dosn't support array in `export` statement.
   - "sed '1i COMPRESSXZ=(xz -T 0 -7 -c -z -)' -i PKGBUILD"
-  - "makepkg -s --noconfirm MAKEFLAGS='-j2' |ts -s '[%.T]'"
+  - "timeout 45m makepkg -s --noconfirm MAKEFLAGS='-j2' |ts -s '[%.T]'"
   - "ccache -s"
 
 script:
