@@ -7,7 +7,6 @@ branches:
 cache:
   directories:
   - .ccache
-  - AUR-repo
   - blender-addons-contrib.git
   - blender-addons.git
   - blender-dev-tools.git
