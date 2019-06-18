@@ -38,12 +38,31 @@ arch:
      sudo sed -i '/^BUILDENV/s/\!ccache/ccache/' /etc/makepkg.conf
      sudo sed -i '/^COMPRESSXZ/s/\xz/xz -T 2/' /etc/makepkg.conf
   script:
+  - "ccache -s"
   - "timeout 45m makepkg -s --noconfirm | ts -s '[%.T]'"
   - "ccache -s"
 
 script:
+- "echo build script:"
+- 'echo -e "travis_fold:start:debug_travis_script\033[33;1mdebug_travis_script\033[0m"'
+- "cat $0"
+- 'echo -e "\ntravis_fold:end:debug_travis_script\r"'
+- 'echo -e "travis_fold:start:debug_travis_job_stages\033[33;1mdebug_travis_job_stages\033[0m"'
+- "cat ${TRAVIS_HOME}/.travis/job_stages"
+- 'echo -e "\ntravis_fold:end:debug_travis_job_stages\r"'
+- 'echo -e "travis_fold:start:debug_travis_functions\033[33;1mdebug_travis_functions\033[0m"'
+- "cat ${TRAVIS_HOME}/.travis/functions"
+- 'echo -e "\ntravis_fold:end:debug_travis_functions\r"'
+- "echo pacman pkg cache size: $(du -h ~/.pkg-cache|cut -f1) in $(ls ~/.pkg-cache|wc -l) files"
+- "echo $HOME/.ccache size: $(du -h ~/.ccache)"
+- "echo source size:"
+- "du -hd0 blender*/"
+- "ccache -s"
 - "curl -s https://raw.githubusercontent.com/bartoszek/arch-travis/pacman-pkg-cache/arch-travis.sh |sed 's:mikkeloscar/arch-travis:bartoszek/arch-travis-bartus:'| bash"
 - "echo pacman pkg cache size: $(du -h ~/.pkg-cache|cut -f1) in $(ls ~/.pkg-cache|wc -l) files"
+- "echo $HOME/.ccache size: $(du -h ~/.ccache)"
+- "echo source size:"
+- "du -hd0 blender*/"
 - "ccache -s"
 
 deploy:
