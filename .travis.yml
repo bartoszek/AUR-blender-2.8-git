@@ -31,13 +31,15 @@ arch:
 #   Override `package-cleanup.hook` to preserve cache for travis.
 #   Enable ccache
 #   Multithreaded build and compress
-#   Shallow clon for git sources
+#   Suppress all gcc warnings
   - |
      sudo mkdir /etc/pacman.d/hooks/
      sudo ln -s /dev/null /etc/pacman.d/hooks/package-cleanup.hook
      sudo sed -i '/#MAKEFLAGS=/c MAKEFLAGS="-j2"' /etc/makepkg.conf
      sudo sed -i '/^BUILDENV/s/\!ccache/ccache/' /etc/makepkg.conf
      sudo sed -i '/^COMPRESSXZ/s/\xz/xz -T 2/' /etc/makepkg.conf
+     sudo sed -i '$a   CFLAGS="$CFLAGS -w"'   /etc/makepkg.conf
+     sudo sed -i '$a CXXFLAGS="$CXXFLAGS -w"' /etc/makepkg.conf
   script:
 #   Incorporate ccache in nvcc
   - |
@@ -53,7 +55,6 @@ arch:
   - "ccache -s"
   - "timeout 35m makepkg -s --noconfirm | ts -s '[%.T]'"
   - "ccache -s"
-
 script:
 - "curl -s https://raw.githubusercontent.com/bartoszek/arch-travis/pacman-pkg-cache/arch-travis.sh |sed 's:mikkeloscar/arch-travis:bartoszek/arch-travis-bartus:'| bash"
 - "echo pacman pkg cache size: $(du -h ~/.pkg-cache|cut -f1) in $(ls ~/.pkg-cache|wc -l) files"
