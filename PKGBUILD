@@ -1,4 +1,5 @@
 # Maintainer : bartus <arch-user-repoᘓbartus.33mail.com>
+# shellcheck disable=SC2034
 
 #to enforce cuda verison uncomment this line and update value of sm_xx model accordingly
 #_cuda_capability+=(sm_30 sm_35 sm_37) # suppress to prevent Travis build exceed time limit.
@@ -70,6 +71,7 @@ build() {
   if [ "$_CUDA_PKG" != "" ]; then
       _EXTRAOPTS=(-DWITH_CYCLES_CUDA_BINARIES=ON \
                   -DCUDA_TOOLKIT_ROOT_DIR=/opt/cuda)
+      ((TRAVIS)) && _EXTRAOPTS+=(-DCUDA_NVCC_FLAGS="--ptxas-options=-w")  # suppress all ptxas warnings in Travis build
       if [ "$_cuda_capability" != "" ]; then
         _EXTRAOPTS+=(-DCYCLES_CUDA_BINARIES_ARCH=$(IFS=';'; echo "${_cuda_capability[*]}";))
       fi
