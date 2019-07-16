@@ -19,8 +19,8 @@ depends=('alembic' 'libgl' 'python' 'python-numpy' 'openjpeg' 'desktop-file-util
 makedepends=('git' 'cmake' 'boost' 'mesa' 'llvm')
 makedepends+=('cuda') # disable to prevent build process from exiting Travis 50m build time limit
 options=(!strip)
-provides=('blender-2.8')
-conflicts=('blender-2.8')
+provides=('blender=2.80')
+conflicts=('blender')
 license=('GPL')
 install=blender.install
 # NOTE: the source array has to be kept in sync with .gitmodules
