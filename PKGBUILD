@@ -77,8 +77,6 @@ build() {
       fi
   fi
 
-  export CFLAGS="${CFLAGS} -DOPENVDB_3_ABI_COMPATIBLE"
-  export CXXFLAGS="${CXXFLAGS} -DOPENVDB_3_ABI_COMPATIBLE"
   cmake "$srcdir/blender" \
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DWITH_INSTALL_PORTABLE=OFF \
