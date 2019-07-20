@@ -3,7 +3,7 @@
 
 #to enforce cuda verison uncomment this line and update value of sm_xx model accordingly
 #_cuda_capability+=(sm_30 sm_35 sm_37) # suppress to prevent Travis build exceed time limit.
-_cuda_capability+=(sm_50 sm_52 sm_60 sm_61 sm_70 sm_75)
+#_cuda_capability+=(sm_50 sm_52 sm_60 sm_61 sm_70 sm_75)
 
 pkgname=blender-2.8-git
 _fragment="#branch=master"
@@ -42,7 +42,7 @@ md5sums=('SKIP'
          'SKIP'
          'SKIP'
          'cd108dca1c77607c6a7cc45aa284ea97'
-         '2f1b08655352e70c7c74d4957d481dc8')
+         'faaf21e4a2c25ce826fa093088758f93')
 
 pkgver() {
   cd "$srcdir/blender"
@@ -53,7 +53,7 @@ prepare() {
   cd "$srcdir/blender"
   # update the submodules
   git submodule update --init --recursive --remote
-  if [ -z "$_cuda_capability" ] && grep -q nvidia <(lsmod); then 
+  if [ -z "$_cuda_capability" ]; then
     git apply -v ${srcdir}/SelectCudaComputeArch.patch
   fi
 }
